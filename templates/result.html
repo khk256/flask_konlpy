@@ -1,0 +1,12 @@
+<!-- <!DOCTYPE html>
+<body>
+<form>
+    <textarea name="text" rows="10" cols="50"></textarea>
+</form>
+</body>
+</html> -->
+<h5>{{text}}</h5>
+
+{% for item in result %}
+    <p> {{ item['tag'] }} : {{item['count']}} 개 </p>
+{% endfor %}
