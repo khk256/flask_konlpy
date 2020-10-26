@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, redirect, url_for
 from konlpy.tag import Twitter
 from collections import Counter
 import unicodedata
+from khaiii import KhaiiiApi
 
 app = Flask(__name__)
 
@@ -17,7 +18,8 @@ def main():
 def analysis(text=None):
     if request.method == 'POST':
         my_text = request.form['text']
-        result = konply_noun(my_text)
+        # result = konply_noun(my_text)
+        result = khaiii_noun(my_text)
         # print(result)
     else:
         result = None
@@ -35,7 +37,22 @@ def konply_noun(text, ntags = 50):
         return_list.append(temp)
 
     return return_list
+
+def khaiii_noun(text, ntags=50):
+    api = KhaiiiApi()
+    result_list = []
+    text = unicodedata.normalize('NFC', text)
+    for word in api.analyze(text):
+        for morph in word.morphs:
+            if morph.tag in ['NNG', 'NNP']:
+                result_list.append(morph.lex)
+    count = Counter(result_list)
+    return_list = []
+    for n, c in count.most_common(ntags):
+        temp = {'tag' : n, 'count' : c}
+        return_list.append(temp)
     
+    return return_list
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port='80', debug=True)
